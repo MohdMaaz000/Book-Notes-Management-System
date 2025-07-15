@@ -1,0 +1,22 @@
+.form-container {
+  margin-top: 5rem;
+  background-color: white;
+  width: 350px;
+  min-height: 350px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0px 0px 2px rgb(204, 204, 204);
+  border-radius: 5px;
+}
+
+.form-btn {
+  width: 100%;
+  margin-top: 8px;
+  margin-bottom: 8px;
+}
+
+.form-login-register-toggle {
+  color: #2563eb;
+  cursor: pointer;
+}

@@ -1,0 +1,12 @@
+.note-name {
+  text-align: left;
+  width: 80%;
+}
+
+.list-item {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  border: none;
+  display: flex;
+  justify-content: space-between;
+}

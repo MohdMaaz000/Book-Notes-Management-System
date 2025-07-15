@@ -1,0 +1,152 @@
+body {
+  background-color: #1e1b4b;
+  color: #94a3b8;
+}
+
+/* home section */
+.home-textmate {
+  color: #1d4ed8;
+}
+
+.home-textmate-bottom{
+  color: #475569;
+}
+
+.info-container {
+  width: 500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-container > button {
+  width: fit-content;
+}
+
+.home-img-container {
+  width: 20rem;
+  height: 20rem;
+  border-radius: 50%;
+  /* box-shadow: 10px 20px 20px white; */
+}
+
+.home-img:hover {
+  transform: scale(1.025);
+  transition: ease;
+  transition-delay: 5ms;
+}
+
+.home-img {
+  width: 20rem;
+  float: right;
+}
+
+.big-container {
+  position: relative;
+  top: 100px;
+  /* border: solid red; */
+  display: flex;
+  flex-direction: row;
+  justify-items: center;
+  justify-content: space-around;
+}
+
+.home-btn-container {
+  display: flex;
+  gap: 10px;
+}
+
+/* home section end*/
+
+/* book section */
+.single-book {
+  margin-top: 5px;
+  margin-bottom: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.book-input-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.book-input-container > input {
+  border-radius: 10px;
+  width: 250px;
+}
+
+.book-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.book-section {
+  background-color: #fafafa;
+  padding: 20px;
+  box-shadow: 0 0 20px black;
+  margin-top: 90px;
+  width: 500px;
+  color: #0f172a;
+  /* height: 400px; */
+}
+/* book section ends */
+
+/* note section */
+.note-input-container {
+  /* width: 400px; */
+  display: flex;
+  justify-content: space-between;
+}
+
+.note-input-container > input {
+  border-radius: 10px;
+  width: 55%;
+}
+
+/* note section ends */
+
+/* editor section */
+.controls {
+  display: flex;
+  justify-content: space-evenly;
+  border: 1px solid #ccc;
+  border-top: 0;
+  padding: 10px;
+}
+
+.controls-right {
+  margin-left: auto;
+}
+
+.state {
+  margin: 10px 0;
+  font-family: monospace;
+}
+
+.state-title {
+  color: #999;
+  text-transform: uppercase;
+}
+
+.ql-editor {
+  max-height: 300px;
+  overflow-y: auto;
+  color: black;
+}
+
+.warning-message {
+  color: red;
+}
+/* editor section ends */
+
+/* Navbar section */
+
+.go-to-book-btn {
+  cursor: pointer;
+}
+
+.navbar-brand {
+  text-transform: capitalize;
+}
+/* Navbar section ends */
