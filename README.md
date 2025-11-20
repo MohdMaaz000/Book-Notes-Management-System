@@ -20,12 +20,12 @@ MongoDB: NoSQL database for storing user data, books, and notes. <br/>
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/huzaif-724/TextMate.git
+git clone https://github.com/MohdMaaz000/Textmate.git
 ```
 
 2. Navigate to the project directory:
 ```bash
-cd text-mate
+cd Textmate
 ```
 
 3. Install dependencies:
