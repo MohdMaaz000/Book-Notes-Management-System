@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="auth-layout">
+    <div class="auth-card">
+        <p class="eyebrow">{{ mode|capitalize }}</p>
+        <h1>{{ form_title }}</h1>
+        <p class="auth-subtitle">{{ subtitle }}</p>
+        {% if error %}
+            <div class="alert error-alert">{{ error }}</div>
+        {% endif %}
+        <form method="post" action="{{ form_action }}" class="stack-form">
+            {% if mode == "register" %}
+                <label>
+                    <span>Full Name</span>
+                    <input type="text" name="name" placeholder="Enter your name" value="{{ form_data.name if form_data else '' }}" required>
+                </label>
+            {% endif %}
+            <label>
+                <span>Email</span>
+                <input type="email" name="email" placeholder="Enter your email" value="{{ form_data.email if form_data else '' }}" required>
+            </label>
+            <label>
+                <span>Password</span>
+                <input type="password" name="password" placeholder="Enter your password" required>
+            </label>
+            <button class="primary-button wide-button" type="submit">{{ submit_label }}</button>
+        </form>
+        <p class="auth-switch">
+            {{ alternate_label }}
+            <a href="{{ alternate_href }}">{{ alternate_link_text }}</a>
+        </p>
+    </div>
+</section>
+{% endblock %}

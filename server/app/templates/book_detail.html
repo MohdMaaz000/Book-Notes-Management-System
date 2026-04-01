@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-intro compact-intro">
+    <div>
+        <p class="eyebrow">Book Workspace</p>
+        <h1>{{ book.title }}</h1>
+        <p>{{ book.description or "Add focused notes, revise them, and keep your knowledge structured." }}</p>
+    </div>
+    <a class="secondary-button" href="/books">Back to Books</a>
+</section>
+
+{% if error %}
+    <div class="alert error-alert">{{ error }}</div>
+{% endif %}
+
+<section class="dashboard-grid">
+    <aside class="panel panel-form">
+        <h2>Add a note</h2>
+        <form method="post" action="/books/{{ book.id }}/notes" class="stack-form">
+            <label>
+                <span>Note Title</span>
+                <input type="text" name="title" placeholder="ACID properties" value="{{ note_form_data.title if note_form_data else '' }}" required>
+            </label>
+            <label>
+                <span>Content</span>
+                <textarea name="content" rows="10" placeholder="Write your note here...">{{ note_form_data.content if note_form_data else '' }}</textarea>
+            </label>
+            <button class="primary-button" type="submit">Add Note</button>
+        </form>
+    </aside>
+
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Notes</h2>
+                <p>{{ notes|length }} note{{ '' if notes|length == 1 else 's' }} inside this book.</p>
+            </div>
+            <form method="get" action="/books/{{ book.id }}" class="search-form">
+                <input type="text" name="search" value="{{ search }}" placeholder="Search notes">
+                <button class="secondary-button" type="submit">Search</button>
+            </form>
+        </div>
+
+        {% if notes %}
+            <div class="note-list">
+                {% for note in notes %}
+                    <article class="note-card">
+                        <form method="post" action="/books/{{ book.id }}/notes/{{ note.id }}" class="stack-form note-editor">
+                            <label>
+                                <span>Title</span>
+                                <input type="text" name="title" value="{{ note.title }}" required>
+                            </label>
+                            <label>
+                                <span>Content</span>
+                                <textarea name="content" rows="8">{{ note.content }}</textarea>
+                            </label>
+                            <div class="resource-actions align-left">
+                                <button class="primary-button" type="submit">Save Note</button>
+                            </div>
+                        </form>
+                        <form method="post" action="/books/{{ book.id }}/notes/{{ note.id }}/delete">
+                            <button class="danger-button" type="submit">Delete</button>
+                        </form>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No notes yet</h3>
+                <p>Add your first note to start turning this book into a useful study resource.</p>
+            </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

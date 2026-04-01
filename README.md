@@ -1,62 +1,139 @@
-# TextMate
-TextMate is a full-stack web application designed for personal book and note management. It allows users to securely authenticate, create, read, update, and delete (CRUD) their books and notes. The application provides a seamless and responsive user interface for easy navigation and efficient management.
+# Book & Notes Management System
 
+Book & Notes Management System is a production-style Python web application for organizing books, topics, and notes in a structured workspace.
 
-## 🚀 Features
+It is built to demonstrate strong internship-ready backend and database skills while still working as a complete web product.
 
-User Authentication: Secure login and registration system. <br/> 
-Book Management: Add, update, delete, and organize personal books. <br/>
-Note Management: Create, edit, and delete notes. <br/>
-Responsive UI: Optimized for various screen sizes, including mobile and tablet devices. <br/>
-CRUD Operations: Complete functionality to manage books and notes efficiently. <br/>
+## Tech Stack
 
-## 🛠️ Tech Stack
-Node.js: Backend runtime environment. <br/>
-Express.js: Web framework for building the backend API. <br/>
-React.js: Frontend library for creating dynamic user interfaces. <br/>
-MongoDB: NoSQL database for storing user data, books, and notes. <br/>
+- Python 3.12
+- FastAPI
+- SQLAlchemy 2
+- PostgreSQL
+- Alembic
+- PyJWT
+- bcrypt
+- Jinja2 templates
+- HTML/CSS
 
-## Getting Started
+## Features
 
-1. Clone the repository:
-```bash
-git clone https://github.com/MohdMaaz000/Textmate.git
+- User registration, login, refresh, and logout flows
+- Session-backed frontend plus REST API
+- Protected book, note, and comment workflows
+- Pagination, search, sorting, and filtering
+- Global error handling and request validation
+- Request logging and rate limiting
+- Environment-based configuration
+- Docker deployment support
+- Server-rendered frontend with Jinja2 templates
+- Render deployment support
+
+## Project Structure
+
+```text
+server/
+  app/
+    api/
+    controllers/
+    core/
+    db/
+    middleware/
+    models/
+    schemas/
+    services/
+    utils/
+    static/
+    templates/
+  requirements.txt
+  Dockerfile
+  start.sh
+render.yaml
+docker-compose.yml
 ```
 
-2. Navigate to the project directory:
-```bash
-cd Textmate
-```
+## Local Setup
 
-3. Install dependencies:
 ```bash
-# For backend
 cd server
-npm install
-
-# For frontend 
-cd client
-npm install
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+alembic upgrade head
+uvicorn app.main:app --reload
 ```
 
-4. Start the development servers:
+App URLs:
+
+- Frontend: `http://localhost:8000/`
+- API docs: `http://localhost:8000/docs`
+- Health check: `http://localhost:8000/api/v1/health`
+
+## Database Migrations
+
 ```bash
-# Start backend server
 cd server
-npm start
-
-# Start frontend server
-cd client
-npm start
+alembic upgrade head
 ```
 
+Create a new migration after model changes:
 
-## Screenshots 
+```bash
+cd server
+alembic revision --autogenerate -m "describe change"
+```
 
+## Testing
 
-![Screenshot 2025-02-08 204542](https://github.com/user-attachments/assets/38f8f9c2-8d95-43ce-b5bd-da6bf831ec32)
+```bash
+cd server
+pytest
+```
 
-![Screenshot 2025-02-08 204216](https://github.com/user-attachments/assets/89696ad6-00ca-4d94-8bfe-e2faeb8fb9dc)
+## Docker
 
-![Screenshot 2025-02-08 204456](https://github.com/user-attachments/assets/782fdcca-8263-4eb3-9231-b51327807ea5)
+```bash
+docker compose up --build
+```
 
+## Render Deployment
+
+The repository includes [`render.yaml`](./render.yaml) for Render deployment.
+
+Deployment model:
+
+- one Render web service
+- one managed PostgreSQL database
+
+Recommended start flow:
+
+```bash
+alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+```
+
+After deployment, update:
+
+- `CORS_ORIGINS` with your live Render URL
+- `JWT_ACCESS_SECRET`
+- `JWT_REFRESH_SECRET`
+- `SESSION_SECRET`
+
+Example:
+
+```env
+CORS_ORIGINS=["https://your-app-name.onrender.com"]
+```
+
+## Key API Endpoints
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+- `POST /api/v1/auth/refresh`
+- `POST /api/v1/auth/logout`
+- `GET /api/v1/auth/me`
+- `GET|POST /api/v1/books`
+- `GET|PATCH|DELETE /api/v1/books/{book_id}`
+- `GET|POST /api/v1/books/{book_id}/notes`
+- `GET|PATCH|DELETE /api/v1/books/{book_id}/notes/{note_id}`
+- `GET|POST /api/v1/notes/{note_id}/comments`
+- `GET|PATCH|DELETE /api/v1/notes/{note_id}/comments/{comment_id}`

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="page-intro">
+    <div>
+        <p class="eyebrow">Workspace</p>
+        <h1>Your Books</h1>
+        <p>Organize subjects, interview prep, project research, or coursework into clean study containers.</p>
+    </div>
+</section>
+
+{% if error %}
+    <div class="alert error-alert">{{ error }}</div>
+{% endif %}
+
+<section class="dashboard-grid">
+    <aside class="panel panel-form">
+        <h2>Create a new book</h2>
+        <form method="post" action="/books" class="stack-form">
+            <label>
+                <span>Book Title</span>
+                <input type="text" name="title" placeholder="Operating Systems" value="{{ form_data.title if form_data else '' }}" required>
+            </label>
+            <label>
+                <span>Description</span>
+                <textarea name="description" rows="5" placeholder="What will this book contain?">{{ form_data.description if form_data else '' }}</textarea>
+            </label>
+            <button class="primary-button" type="submit">Create Book</button>
+        </form>
+    </aside>
+
+    <section class="panel">
+        <div class="panel-header">
+            <div>
+                <h2>Library</h2>
+                <p>{{ books|length }} book{{ '' if books|length == 1 else 's' }} ready for study.</p>
+            </div>
+            <form method="get" action="/books" class="search-form">
+                <input type="text" name="search" value="{{ search }}" placeholder="Search books">
+                <button class="secondary-button" type="submit">Search</button>
+            </form>
+        </div>
+
+        {% if books %}
+            <div class="card-list">
+                {% for book in books %}
+                    <article class="resource-card">
+                        <div class="resource-main">
+                            <h3><a href="/books/{{ book.id }}">{{ book.title }}</a></h3>
+                            <p>{{ book.description or "No description added yet." }}</p>
+                        </div>
+                        <div class="resource-actions">
+                            <a class="secondary-button" href="/books/{{ book.id }}">Open</a>
+                            <form method="post" action="/books/{{ book.id }}/delete">
+                                <button class="danger-button" type="submit">Delete</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-state">
+                <h3>No books yet</h3>
+                <p>Create your first book to start organizing notes.</p>
+            </div>
+        {% endif %}
+    </section>
+</section>
+{% endblock %}

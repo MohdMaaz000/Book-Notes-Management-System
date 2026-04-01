@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-copy">
+        <p class="eyebrow">Python-first note system</p>
+        <h1>Build books, organize notes, and keep your learning structured.</h1>
+        <p class="hero-text">
+            Book & Notes Management System is a production-style study workspace powered by FastAPI, PostgreSQL, SQLAlchemy, and Alembic.
+            It is designed to show strong backend engineering while still feeling like a real app.
+        </p>
+        <div class="hero-actions">
+            <a class="primary-button" href="/register">Create Account</a>
+            <a class="secondary-button" href="/login">Login</a>
+        </div>
+        <ul class="feature-list">
+            <li>Secure authentication and session-based frontend flow</li>
+            <li>Organized book and note management</li>
+            <li>Production-ready Python project structure</li>
+        </ul>
+    </div>
+    <div class="hero-card">
+        <div class="floating-card accent-a">
+            <h3>Books</h3>
+            <p>Group topics by subject, course, or project.</p>
+        </div>
+        <div class="floating-card accent-b">
+            <h3>Notes</h3>
+            <p>Write and refine structured study material.</p>
+        </div>
+        <div class="floating-card accent-c">
+            <h3>Backend Skills</h3>
+            <p>FastAPI, PostgreSQL, SQLAlchemy, Alembic, auth, deployment-ready structure.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
