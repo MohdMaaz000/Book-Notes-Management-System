@@ -2,7 +2,7 @@ services:
   - type: web
     name: book-notes-management-system
     runtime: python
-    rootDir: server
+    rootDir: backend
     healthCheckPath: /api/v1/health
     buildCommand: pip install -r requirements.txt
     startCommand: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}"

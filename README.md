@@ -32,7 +32,7 @@ It is built to demonstrate strong internship-ready backend and database skills w
 ## Project Structure
 
 ```text
-server/
+backend/
   app/
     api/
     controllers/
@@ -55,7 +55,7 @@ docker-compose.yml
 ## Local Setup
 
 ```bash
-cd server
+cd backend
 python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
