@@ -28,6 +28,7 @@ It is built to demonstrate strong internship-ready backend and database skills w
 - Docker deployment support
 - Server-rendered frontend with Jinja2 templates
 - Render deployment support
+- Railway + Neon deployment support
 
 ## Project Structure
 
@@ -72,21 +73,21 @@ App URLs:
 ## Database Migrations
 
 ```bash
-cd server
+cd backend
 alembic upgrade head
 ```
 
 Create a new migration after model changes:
 
 ```bash
-cd server
+cd backend
 alembic revision --autogenerate -m "describe change"
 ```
 
 ## Testing
 
 ```bash
-cd server
+cd backend
 pytest
 ```
 
@@ -95,6 +96,67 @@ pytest
 ```bash
 docker compose up --build
 ```
+
+## Railway + Neon Deployment
+
+This project works well with:
+
+- Neon for managed PostgreSQL
+- Railway for hosting the FastAPI app
+
+Recommended setup:
+
+1. Create a PostgreSQL database in Neon.
+2. Copy the Neon connection string into `DATABASE_URL`.
+3. Deploy the `backend/` service on Railway.
+4. Set the app environment variables in Railway.
+5. Run `alembic upgrade head` before the app goes live.
+6. Open the deployed URL and verify the health check, frontend, and auth flow.
+
+Suggested Railway service settings:
+
+- Root directory: `backend`
+- Build command: `pip install -r requirements.txt`
+- Start command: `uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}`
+- Pre-deploy command: `alembic upgrade head`
+- Health check path: `/api/v1/health`
+
+Required environment variables:
+
+- `DATABASE_URL`
+- `JWT_ACCESS_SECRET`
+- `JWT_REFRESH_SECRET`
+- `SESSION_SECRET`
+
+Recommended environment variables:
+
+- `APP_NAME=Book & Notes Management System`
+- `ENVIRONMENT=production`
+- `API_V1_PREFIX=/api/v1`
+- `HOST=0.0.0.0`
+- `JWT_ACCESS_EXP_MINUTES=15`
+- `JWT_REFRESH_EXP_DAYS=7`
+- `JWT_ALGORITHM=HS256`
+- `REFRESH_COOKIE_NAME=book_notes_refresh_token`
+- `BCRYPT_ROUNDS=12`
+- `RATE_LIMIT_WINDOW_SECONDS=900`
+- `RATE_LIMIT_MAX_REQUESTS=200`
+- `AUTH_RATE_LIMIT_MAX_REQUESTS=20`
+
+For browser access after deployment, update:
+
+- `CORS_ORIGINS` with your Railway app URL
+
+Example:
+
+```env
+CORS_ORIGINS=["https://your-app-name.up.railway.app"]
+```
+
+Neon note:
+
+- Use the Neon PostgreSQL connection string directly as `DATABASE_URL`.
+- If Neon provides multiple URLs, prefer the pooled connection string for app traffic and keep SSL enabled in the URL.
 
 ## Render Deployment
 
