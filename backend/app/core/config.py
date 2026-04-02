@@ -42,6 +42,15 @@ class Settings(BaseSettings):
         return self.environment == "production"
 
     @property
+    def sqlalchemy_database_url(self) -> str:
+        url = self.database_url
+        if url.startswith("postgresql://") and "+psycopg" not in url.split("://", 1)[0]:
+            return url.replace("postgresql://", "postgresql+psycopg://", 1)
+        if url.startswith("postgres://"):
+            return url.replace("postgres://", "postgresql+psycopg://", 1)
+        return url
+
+    @property
     def cors_origin_list(self) -> list[str]:
         value = self.cors_origins
         try:
