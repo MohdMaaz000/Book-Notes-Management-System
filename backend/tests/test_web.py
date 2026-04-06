@@ -6,6 +6,14 @@ def test_landing_page_renders_html(client):
     assert "Create Account" in response.text
 
 
+def test_static_stylesheet_is_served(client):
+    response = client.get("/static/styles.css")
+
+    assert response.status_code == 200
+    assert "text/css" in response.headers["content-type"]
+    assert ".page-shell" in response.text
+
+
 def test_register_login_and_book_note_web_flow(client):
     register_response = client.post(
         "/register",
@@ -58,3 +66,17 @@ def test_login_page_shows_error_for_invalid_credentials(client):
 
     assert response.status_code == 400
     assert "Invalid email or password" in response.text
+
+
+def test_register_page_shows_validation_error_for_short_name(client):
+    response = client.post(
+        "/register",
+        data={
+            "name": "A",
+            "email": "template@example.com",
+            "password": "supersecret123",
+        },
+    )
+
+    assert response.status_code == 400
+    assert "Please check your input and try again" in response.text

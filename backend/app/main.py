@@ -7,6 +7,7 @@ from starlette.staticfiles import StaticFiles
 from app.api.router import api_router
 from app.core.config import settings
 from app.core.logging import configure_logging
+from app.core.paths import STATIC_DIR
 from app.middleware.error_handlers import (
     app_error_handler,
     generic_error_handler,
@@ -43,7 +44,7 @@ app.add_exception_handler(Exception, generic_error_handler)
 
 app.include_router(api_router)
 app.include_router(web_router)
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 
 @app.get("/api", tags=["meta"])

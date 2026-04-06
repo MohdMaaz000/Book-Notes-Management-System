@@ -6,9 +6,12 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, Form, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.core.logging import logger
+from app.core.paths import TEMPLATES_DIR
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import LoginRequest, RegisterRequest
@@ -19,8 +22,7 @@ from app.services.book_service import book_service
 from app.services.note_service import note_service
 from app.utils.exceptions import AppError
 
-
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 web_router = APIRouter(include_in_schema=False)
 
 
@@ -110,7 +112,8 @@ def register_submit(
     try:
         payload = RegisterRequest(name=name, email=email, password=password)
         user, _, refresh_token = auth_service.register(db, payload.name, payload.email, payload.password)
-    except Exception as exc:  # noqa: BLE001
+    except ValidationError as exc:
+        logger.info("Register form validation failed for email=%s: %s", email, exc.errors())
         return templates.TemplateResponse(
             request,
             "auth.html",
@@ -125,10 +128,52 @@ def register_submit(
                 alternate_link_text="Login",
                 form_action="/register",
                 mode="register",
-                error=exc.message if isinstance(exc, AppError) else "Unable to create your account right now",
+                error="Please check your input and try again",
                 form_data={"name": name, "email": email},
             ),
-            status_code=400 if isinstance(exc, AppError) else 500,
+            status_code=400,
+        )
+    except AppError as exc:
+        logger.info("Register request rejected for email=%s: %s", email, exc.message)
+        return templates.TemplateResponse(
+            request,
+            "auth.html",
+            _template_context(
+                request,
+                page_title="Register",
+                form_title="Build your study space",
+                subtitle="Create your account and manage books and notes from one organized place.",
+                submit_label="Create account",
+                alternate_label="Already have an account?",
+                alternate_href="/login",
+                alternate_link_text="Login",
+                form_action="/register",
+                mode="register",
+                error=exc.message,
+                form_data={"name": name, "email": email},
+            ),
+            status_code=400,
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Register form failed unexpectedly for email=%s", email)
+        return templates.TemplateResponse(
+            request,
+            "auth.html",
+            _template_context(
+                request,
+                page_title="Register",
+                form_title="Build your study space",
+                subtitle="Create your account and manage books and notes from one organized place.",
+                submit_label="Create account",
+                alternate_label="Already have an account?",
+                alternate_href="/login",
+                alternate_link_text="Login",
+                form_action="/register",
+                mode="register",
+                error="Unable to create your account right now",
+                form_data={"name": name, "email": email},
+            ),
+            status_code=500,
         )
 
     _store_user_session(request, user)
@@ -169,7 +214,8 @@ def login_submit(
     try:
         payload = LoginRequest(email=email, password=password)
         user, _, refresh_token = auth_service.login(db, payload.email, payload.password)
-    except Exception as exc:  # noqa: BLE001
+    except ValidationError as exc:
+        logger.info("Login form validation failed for email=%s: %s", email, exc.errors())
         return templates.TemplateResponse(
             request,
             "auth.html",
@@ -184,10 +230,52 @@ def login_submit(
                 alternate_link_text="Register",
                 form_action="/login",
                 mode="login",
-                error=exc.message if isinstance(exc, AppError) else "Unable to log you in right now",
+                error="Please check your input and try again",
                 form_data={"email": email},
             ),
-            status_code=400 if isinstance(exc, AppError) else 500,
+            status_code=400,
+        )
+    except AppError as exc:
+        logger.info("Login request rejected for email=%s: %s", email, exc.message)
+        return templates.TemplateResponse(
+            request,
+            "auth.html",
+            _template_context(
+                request,
+                page_title="Login",
+                form_title="Sign in to your workspace",
+                subtitle="Continue managing books, topics, and notes from your Python-backed workspace.",
+                submit_label="Login",
+                alternate_label="New here?",
+                alternate_href="/register",
+                alternate_link_text="Register",
+                form_action="/login",
+                mode="login",
+                error=exc.message,
+                form_data={"email": email},
+            ),
+            status_code=400,
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Login form failed unexpectedly for email=%s", email)
+        return templates.TemplateResponse(
+            request,
+            "auth.html",
+            _template_context(
+                request,
+                page_title="Login",
+                form_title="Sign in to your workspace",
+                subtitle="Continue managing books, topics, and notes from your Python-backed workspace.",
+                submit_label="Login",
+                alternate_label="New here?",
+                alternate_href="/register",
+                alternate_link_text="Register",
+                form_action="/login",
+                mode="login",
+                error="Unable to log you in right now",
+                form_data={"email": email},
+            ),
+            status_code=500,
         )
 
     _store_user_session(request, user)
