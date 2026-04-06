@@ -3,9 +3,9 @@ version: "3.9"
 services:
   api:
     build:
-      context: ./server
+      context: ./backend
     env_file:
-      - ./server/.env
+      - ./backend/.env
     ports:
       - "8000:8000"
     depends_on:

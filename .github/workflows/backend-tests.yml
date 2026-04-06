@@ -1,0 +1,34 @@
+name: Backend Tests
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run test suite
+        env:
+          DATABASE_URL: sqlite+pysqlite:///:memory:
+          JWT_ACCESS_SECRET: test-access-secret-string-with-32-chars
+          JWT_REFRESH_SECRET: test-refresh-secret-string-with-32ch
+          SESSION_SECRET: test-session-secret-string-with-32chars
+          ENVIRONMENT: test
+        run: python -m pytest

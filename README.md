@@ -88,7 +88,7 @@ alembic revision --autogenerate -m "describe change"
 
 ```bash
 cd backend
-pytest
+python -m pytest
 ```
 
 ## Docker
@@ -110,15 +110,14 @@ Recommended setup:
 2. Copy the Neon connection string into `DATABASE_URL`.
 3. Deploy the `backend/` service on Railway.
 4. Set the app environment variables in Railway.
-5. Run `alembic upgrade head` before the app goes live.
+5. Ensure migrations run before the app serves traffic.
 6. Open the deployed URL and verify the health check, frontend, and auth flow.
 
 Suggested Railway service settings:
 
 - Root directory: `backend`
 - Build command: `pip install -r requirements.txt`
-- Start command: `uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}`
-- Pre-deploy command: `alembic upgrade head`
+- Start command: `sh start.sh`
 - Health check path: `/api/v1/health`
 
 Required environment variables:

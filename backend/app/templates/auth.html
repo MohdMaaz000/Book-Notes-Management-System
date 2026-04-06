@@ -13,7 +13,7 @@
             {% if mode == "register" %}
                 <label>
                     <span>Full Name</span>
-                    <input type="text" name="name" placeholder="Enter your name" value="{{ form_data.name if form_data else '' }}" required>
+                    <input type="text" name="name" placeholder="Enter your name" value="{{ form_data.name if form_data else '' }}" minlength="2" maxlength="120" required>
                 </label>
             {% endif %}
             <label>
@@ -22,8 +22,9 @@
             </label>
             <label>
                 <span>Password</span>
-                <input type="password" name="password" placeholder="Enter your password" required>
+                <input type="password" name="password" placeholder="Enter your password" minlength="8" maxlength="128" required>
             </label>
+            <p class="form-hint">Use at least 8 characters for your password.</p>
             <button class="primary-button wide-button" type="submit">{{ submit_label }}</button>
         </form>
         <p class="auth-switch">

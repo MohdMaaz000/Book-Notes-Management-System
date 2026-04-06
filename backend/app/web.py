@@ -4,6 +4,7 @@ from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, Form, Request
+from fastapi.responses import FileResponse
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pydantic import ValidationError
@@ -11,7 +12,7 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.logging import logger
-from app.core.paths import TEMPLATES_DIR
+from app.core.paths import STATIC_DIR, TEMPLATES_DIR
 from app.db.session import get_db
 from app.models.user import User
 from app.schemas.auth import LoginRequest, RegisterRequest
@@ -31,9 +32,16 @@ def _template_context(request: Request, **context):
         "request": request,
         "current_user": request.session.get("user"),
         "app_name": "Book & Notes Management System",
+        "flash_messages": request.session.pop("flash_messages", []),
     }
     base_context.update(context)
     return base_context
+
+
+def _validation_error_message(exc: ValidationError) -> str:
+    first_error = exc.errors()[0]
+    field = str(first_error["loc"][-1]).replace("_", " ").capitalize()
+    return f"{field}: {first_error['msg']}"
 
 
 def _set_refresh_cookie(response: RedirectResponse, token: str) -> None:
@@ -56,6 +64,12 @@ def _store_user_session(request: Request, user: User) -> None:
     request.session["user"] = {"id": str(user.id), "name": user.name, "email": user.email}
 
 
+def _push_flash_message(request: Request, message: str, category: str = "success") -> None:
+    flash_messages = request.session.setdefault("flash_messages", [])
+    flash_messages.append({"message": message, "category": category})
+    request.session["flash_messages"] = flash_messages
+
+
 def _get_session_user(request: Request, db: Session) -> User:
     user_data = request.session.get("user")
     if not user_data or not user_data.get("id"):
@@ -70,6 +84,16 @@ def _get_session_user(request: Request, db: Session) -> User:
 
 def _redirect(path: str) -> RedirectResponse:
     return RedirectResponse(url=path, status_code=303)
+
+
+@web_router.get("/favicon.ico")
+def favicon() -> FileResponse:
+    return FileResponse(STATIC_DIR / "favicon.svg", media_type="image/svg+xml")
+
+
+@web_router.get("/robots.txt")
+def robots() -> FileResponse:
+    return FileResponse(STATIC_DIR / "robots.txt", media_type="text/plain; charset=utf-8")
 
 
 @web_router.get("/")
@@ -128,7 +152,7 @@ def register_submit(
                 alternate_link_text="Login",
                 form_action="/register",
                 mode="register",
-                error="Please check your input and try again",
+                error=_validation_error_message(exc),
                 form_data={"name": name, "email": email},
             ),
             status_code=400,
@@ -177,6 +201,7 @@ def register_submit(
         )
 
     _store_user_session(request, user)
+    _push_flash_message(request, "Account created successfully.")
     response = _redirect("/books")
     _set_refresh_cookie(response, refresh_token)
     return response
@@ -230,7 +255,7 @@ def login_submit(
                 alternate_link_text="Register",
                 form_action="/login",
                 mode="login",
-                error="Please check your input and try again",
+                error=_validation_error_message(exc),
                 form_data={"email": email},
             ),
             status_code=400,
@@ -279,6 +304,7 @@ def login_submit(
         )
 
     _store_user_session(request, user)
+    _push_flash_message(request, "Welcome back.")
     response = _redirect("/books")
     _set_refresh_cookie(response, refresh_token)
     return response
@@ -287,6 +313,7 @@ def login_submit(
 @web_router.post("/logout")
 def logout_submit(request: Request):
     request.session.clear()
+    _push_flash_message(request, "You have been logged out.")
     response = _redirect("/")
     _clear_refresh_cookie(response)
     return response
@@ -317,6 +344,7 @@ def create_book_submit(
     try:
         user = _get_session_user(request, db)
         book_service.create_book(db, user, BookCreate(title=title, description=description or None))
+        _push_flash_message(request, "Book created successfully.")
         return _redirect("/books")
     except AppError as exc:
         result = book_service.list_books(
@@ -344,6 +372,7 @@ def delete_book_submit(request: Request, book_id: UUID, db: Session = Depends(ge
     try:
         user = _get_session_user(request, db)
         book_service.delete_book(db, user, book_id)
+        _push_flash_message(request, "Book deleted successfully.")
     except AppError:
         pass
     return _redirect("/books")
@@ -377,6 +406,7 @@ def create_note_submit(
     try:
         user = _get_session_user(request, db)
         note_service.create_note(db, user, book_id, NoteCreate(title=title, content=content))
+        _push_flash_message(request, "Note added successfully.")
         return _redirect(f"/books/{book_id}")
     except AppError as exc:
         book = book_service.get_book(db, user, book_id)
@@ -414,6 +444,7 @@ def update_note_submit(
     try:
         user = _get_session_user(request, db)
         note_service.update_note(db, user, book_id, note_id, NoteUpdate(title=title, content=content))
+        _push_flash_message(request, "Note saved successfully.")
     except AppError:
         pass
     return _redirect(f"/books/{book_id}")
@@ -424,6 +455,7 @@ def delete_note_submit(request: Request, book_id: UUID, note_id: UUID, db: Sessi
     try:
         user = _get_session_user(request, db)
         note_service.delete_note(db, user, book_id, note_id)
+        _push_flash_message(request, "Note deleted successfully.")
     except AppError:
         pass
     return _redirect(f"/books/{book_id}")

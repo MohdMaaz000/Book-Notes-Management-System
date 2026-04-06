@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ page_title or app_name }}</title>
     <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', path='/favicon.svg') }}" type="image/svg+xml">
 </head>
 <body>
     <div class="page-shell">
@@ -27,6 +28,13 @@
             </nav>
         </header>
         <main>
+            {% if flash_messages %}
+                <section class="flash-stack" aria-live="polite">
+                    {% for flash in flash_messages %}
+                        <div class="alert {{ 'success-alert' if flash.category == 'success' else 'error-alert' }}">{{ flash.message }}</div>
+                    {% endfor %}
+                </section>
+            {% endif %}
             {% block content %}{% endblock %}
         </main>
     </div>
