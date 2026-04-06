@@ -197,13 +197,13 @@ textarea { resize: vertical; }
 
 .success-alert {
   background: rgba(44, 214, 157, 0.14);
-  color: #d7ffee;
+  color: #166534;
   border: 1px solid rgba(44, 214, 157, 0.28);
 }
 
 .error-alert {
   background: rgba(214, 69, 93, 0.14);
-  color: #ffd8df;
+  color: #9f1239;
   border: 1px solid rgba(214, 69, 93, 0.3);
 }
 
