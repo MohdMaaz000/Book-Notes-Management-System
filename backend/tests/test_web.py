@@ -108,3 +108,22 @@ def test_register_page_shows_validation_error_for_short_password(client):
 
     assert response.status_code == 400
     assert "Password: String should have at least 8 characters" in response.text
+
+
+def test_book_form_shows_validation_error_for_long_description(client):
+    client.post(
+        "/register",
+        data={
+            "name": "Template User",
+            "email": "template@example.com",
+            "password": "supersecret123",
+        },
+    )
+
+    response = client.post(
+        "/books",
+        data={"title": "Databases", "description": "x" * 2001},
+    )
+
+    assert response.status_code == 400
+    assert "Description: String should have at most 2000 characters" in response.text

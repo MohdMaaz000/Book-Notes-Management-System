@@ -346,6 +346,27 @@ def create_book_submit(
         book_service.create_book(db, user, BookCreate(title=title, description=description or None))
         _push_flash_message(request, "Book created successfully.")
         return _redirect("/books")
+    except ValidationError as exc:
+        logger.info("Book form validation failed for user_id=%s: %s", request.session.get("user", {}).get("id"), exc.errors())
+        user = _get_session_user(request, db)
+        result = book_service.list_books(
+            db,
+            user,
+            BookQueryParams(page=1, page_size=100, sort_by="updated_at", sort_order="desc"),
+        )
+        return templates.TemplateResponse(
+            request,
+            "books.html",
+            _template_context(
+                request,
+                books=result["items"],
+                search="",
+                page_title="Books",
+                error=_validation_error_message(exc),
+                form_data={"title": title, "description": description},
+            ),
+            status_code=400,
+        )
     except AppError as exc:
         result = book_service.list_books(
             db,
@@ -364,6 +385,27 @@ def create_book_submit(
                 form_data={"title": title, "description": description},
             ),
             status_code=400,
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Book form failed unexpectedly for user_id=%s", request.session.get("user", {}).get("id"))
+        user = _get_session_user(request, db)
+        result = book_service.list_books(
+            db,
+            user,
+            BookQueryParams(page=1, page_size=100, sort_by="updated_at", sort_order="desc"),
+        )
+        return templates.TemplateResponse(
+            request,
+            "books.html",
+            _template_context(
+                request,
+                books=result["items"],
+                search="",
+                page_title="Books",
+                error="Unable to create the book right now",
+                form_data={"title": title, "description": description},
+            ),
+            status_code=500,
         )
 
 
@@ -408,6 +450,30 @@ def create_note_submit(
         note_service.create_note(db, user, book_id, NoteCreate(title=title, content=content))
         _push_flash_message(request, "Note added successfully.")
         return _redirect(f"/books/{book_id}")
+    except ValidationError as exc:
+        logger.info("Note form validation failed for book_id=%s: %s", book_id, exc.errors())
+        user = _get_session_user(request, db)
+        book = book_service.get_book(db, user, book_id)
+        notes = note_service.list_notes(
+            db,
+            user,
+            book_id,
+            NoteQueryParams(page=1, page_size=100, sort_by="updated_at", sort_order="desc"),
+        )["items"]
+        return templates.TemplateResponse(
+            request,
+            "book_detail.html",
+            _template_context(
+                request,
+                book=book,
+                notes=notes,
+                search="",
+                page_title=book.title,
+                error=_validation_error_message(exc),
+                note_form_data={"title": title, "content": content},
+            ),
+            status_code=400,
+        )
     except AppError as exc:
         book = book_service.get_book(db, user, book_id)
         notes = note_service.list_notes(
@@ -429,6 +495,30 @@ def create_note_submit(
                 note_form_data={"title": title, "content": content},
             ),
             status_code=400,
+        )
+    except Exception:  # noqa: BLE001
+        logger.exception("Note form failed unexpectedly for book_id=%s", book_id)
+        user = _get_session_user(request, db)
+        book = book_service.get_book(db, user, book_id)
+        notes = note_service.list_notes(
+            db,
+            user,
+            book_id,
+            NoteQueryParams(page=1, page_size=100, sort_by="updated_at", sort_order="desc"),
+        )["items"]
+        return templates.TemplateResponse(
+            request,
+            "book_detail.html",
+            _template_context(
+                request,
+                book=book,
+                notes=notes,
+                search="",
+                page_title=book.title,
+                error="Unable to create the note right now",
+                note_form_data={"title": title, "content": content},
+            ),
+            status_code=500,
         )
 
 

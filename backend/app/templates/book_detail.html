@@ -20,11 +20,11 @@
         <form method="post" action="/books/{{ book.id }}/notes" class="stack-form">
             <label>
                 <span>Note Title</span>
-                <input type="text" name="title" placeholder="ACID properties" value="{{ note_form_data.title if note_form_data else '' }}" required>
+                <input type="text" name="title" placeholder="ACID properties" value="{{ note_form_data.title if note_form_data else '' }}" minlength="2" maxlength="160" required>
             </label>
             <label>
                 <span>Content</span>
-                <textarea name="content" rows="10" placeholder="Write your note here...">{{ note_form_data.content if note_form_data else '' }}</textarea>
+                <textarea name="content" rows="10" placeholder="Write your note here..." maxlength="10000">{{ note_form_data.content if note_form_data else '' }}</textarea>
             </label>
             <button class="primary-button" type="submit">Add Note</button>
         </form>
@@ -49,11 +49,11 @@
                         <form method="post" action="/books/{{ book.id }}/notes/{{ note.id }}" class="stack-form note-editor">
                             <label>
                                 <span>Title</span>
-                                <input type="text" name="title" value="{{ note.title }}" required>
+                                <input type="text" name="title" value="{{ note.title }}" minlength="2" maxlength="160" required>
                             </label>
                             <label>
                                 <span>Content</span>
-                                <textarea name="content" rows="8">{{ note.content }}</textarea>
+                                <textarea name="content" rows="8" maxlength="10000">{{ note.content }}</textarea>
                             </label>
                             <div class="resource-actions align-left">
                                 <button class="primary-button" type="submit">Save Note</button>

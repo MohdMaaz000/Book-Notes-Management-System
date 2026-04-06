@@ -19,11 +19,11 @@
         <form method="post" action="/books" class="stack-form">
             <label>
                 <span>Book Title</span>
-                <input type="text" name="title" placeholder="Operating Systems" value="{{ form_data.title if form_data else '' }}" required>
+                <input type="text" name="title" placeholder="Operating Systems" value="{{ form_data.title if form_data else '' }}" minlength="2" maxlength="160" required>
             </label>
             <label>
                 <span>Description</span>
-                <textarea name="description" rows="5" placeholder="What will this book contain?">{{ form_data.description if form_data else '' }}</textarea>
+                <textarea name="description" rows="5" placeholder="What will this book contain?" maxlength="2000">{{ form_data.description if form_data else '' }}</textarea>
             </label>
             <button class="primary-button" type="submit">Create Book</button>
         </form>
